@@ -145,7 +145,7 @@ def save_performance_profile(values: np.ndarray, min_val: float, max_val: float,
     ```
     """
     thresholds = np.linspace(min_val, max_val, 50)
-    med, lowq, highq = performance_profile(thresholds, values)
+    med, lowq, highq = performance_profile(values, thresholds)
     out = np.vstack((thresholds, med, lowq, highq)).transpose()
     header = " ".join(("thresholds", "med", "lowq", "highq"))
     fmt = " ".join(("%.3f", "%.3f", "%.3f", "%.3f"))
