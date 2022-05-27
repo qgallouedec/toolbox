@@ -6,7 +6,7 @@ setup(
     url="https://github.com/qgallouedec/toolbox",
     description="Some usefull tools",
     long_description=open("README.md").read(),
-    install_requires=["numpy", "scipy", "rliable"],
+    install_requires=["numpy", "scipy", "rliable", "pygame", "Pillow"],
     extras_require={
         "extras": ["pytest", "black", "isort"],
     },
