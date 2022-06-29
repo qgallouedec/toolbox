@@ -1,9 +1,10 @@
+from math import atan2, cos, sin
 from typing import List, Optional, Tuple
 
 import numpy as np
 import pygame
 from PIL import Image
-from pygame import gfxdraw, Color, Surface
+from pygame import Color, Surface, gfxdraw
 
 SCREEN_DIM = 500
 BOUND = 13
@@ -52,7 +53,7 @@ def draw_circle(surf: Surface, pos: np.ndarray, radius: int = 3, color: Color = 
     gfxdraw.circle(surf, int(x), int(y), radius, color)
 
 
-def draw_line(surf: Surface, point_a: np.ndarray, point_b: np.ndarray, color: Color = BLACK):
+def draw_line(surf: Surface, point_a: np.ndarray, point_b: np.ndarray, thickness: float = 2, color: Color = BLACK):
     """
     Draw a line on the surface
 
@@ -62,12 +63,46 @@ def draw_line(surf: Surface, point_a: np.ndarray, point_b: np.ndarray, color: Co
     :type point_a: np.ndarray
     :param point_b: The other point
     :type point_b: np.ndarray
+    :param thickness: Thickness of the line
+    :type: float
     :param color: Color of the line, defaults to BLACK
     :type color: Color, optional
     """
-    x1, y1 = point_a * SCALE + OFFSET
-    x2, y2 = point_b * SCALE + OFFSET
-    gfxdraw.line(surf, int(x1), int(y1), int(x2), int(y2), color)
+    point_a = point_a * SCALE + OFFSET
+    point_b = point_b * SCALE + OFFSET
+    # gfxdraw.filled_polygon(surf, ((0, 0), (100, 100), (50, 30)), BLACK)
+    # gfxdraw.line(surf, int(x1), int(y1), int(x2), int(y2), color)
+
+    center = (point_a + point_b) / 2.0
+
+    # Then find the slope (angle) of the line:
+    length = np.linalg.norm(point_a - point_b)  # Total length of line
+    angle = atan2(point_a[1] - point_b[1], point_a[0] - point_b[0])
+
+    # Using the slope and the shape parameters you can calculate the following
+    # coordinates of the box ends:
+    UL = (
+        center[0] + (length / 2.0) * cos(angle) - (thickness / 2.0) * sin(angle),
+        center[1] + (thickness / 2.0) * cos(angle) + (length / 2.0) * sin(angle),
+    )
+    UR = (
+        center[0] - (length / 2.0) * cos(angle) - (thickness / 2.0) * sin(angle),
+        center[1] + (thickness / 2.0) * cos(angle) - (length / 2.0) * sin(angle),
+    )
+    BL = (
+        center[0] + (length / 2.0) * cos(angle) + (thickness / 2.0) * sin(angle),
+        center[1] - (thickness / 2.0) * cos(angle) + (length / 2.0) * sin(angle),
+    )
+    BR = (
+        center[0] - (length / 2.0) * cos(angle) + (thickness / 2.0) * sin(angle),
+        center[1] - (thickness / 2.0) * cos(angle) - (length / 2.0) * sin(angle),
+    )
+
+    # Using the computed coordinates, we draw an unfilled anti-aliased polygon
+    # (thanks to @martineau) and then fill it as suggested in the documentation
+    # of pygame's gfxdraw module for drawing shapes.
+    pygame.gfxdraw.aapolygon(surf, (UL, UR, BR, BL), color)
+    pygame.gfxdraw.filled_polygon(surf, (UL, UR, BR, BL), color)
 
 
 def rot(x: np.ndarray, theta: float) -> np.ndarray:
@@ -128,13 +163,13 @@ def render_and_save(
                 surf,
                 rot(np.array([-20, (i - 200 + origin) * width]), angle),
                 rot(np.array([20, (i - 200 + origin) * width]), angle),
-                GRAY,
+                color=GRAY,
             )
             draw_line(
                 surf,
                 rot(np.array([(i - 200 + origin) * width, -20]), angle),
                 rot(np.array([(i - 200 + origin) * width, 20]), angle),
-                GRAY,
+                color=GRAY,
             )
 
     # Draw visited points
@@ -149,11 +184,11 @@ def render_and_save(
     trajectories = [] if trajectories is None else trajectories
     for trajectory in trajectories:
         for i in range(len(trajectory) - 1):
-            draw_line(surf, trajectory[i], trajectory[i + 1], GREEN)
+            draw_line(surf, trajectory[i], trajectory[i + 1], color=GREEN)
 
     # Draw walls
     for point_a, point_b in walls:
-        draw_line(surf, point_a, point_b, BLACK if bg == WHITE else WHITE)
+        draw_line(surf, point_a, point_b, color=BLACK if bg == WHITE else WHITE)
 
     surf = pygame.transform.flip(surf, flip_x=False, flip_y=True)
     screen.blit(surf, (0, 0))
