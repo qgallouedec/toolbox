@@ -15,3 +15,19 @@ class FetchWrapper(gym.Wrapper):
         object_pos = self.env.sim.data.get_site_xpos("object0")
         info["object_z"] = object_pos[2]
         return obs, reward, done, info
+
+
+def cumulative_object_coverage(observations):
+    object_pos = observations[:, 8:11]
+    cells = np.floor(object_pos * 10)
+    seen_cells = []
+    counts = np.zeros(observations.shape[0])
+    for t, cell in enumerate(cells):
+        is_new = True
+        for seen_cell in seen_cells:
+            if (seen_cell == cell).all():
+                is_new = False
+        if is_new:
+            seen_cells.append(cell)
+        counts[t] = len(seen_cells)
+    return counts
