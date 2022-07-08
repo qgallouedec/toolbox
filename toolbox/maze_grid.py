@@ -1,7 +1,14 @@
 import numpy as np
 
 
-def cumulative_cells(observations):
+def compute_coverage(observations: np.ndarray) -> np.ndarray:
+    """
+    For observations, return the cumulative space coverage.
+
+    :param observations: Observations as (num_timesteps, n_envs, obs)
+    :type observations: np.ndarray
+    :rtype: 1D np.ndarray as (num_timesteps,)
+    """
     cells = np.floor(observations)
     seen_cells = []
     counts = np.zeros(observations.shape[0])
