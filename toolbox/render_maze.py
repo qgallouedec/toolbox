@@ -164,14 +164,14 @@ def render_and_save(
                 rot(np.array([-20, (i - 200 + origin) * width]), angle),
                 rot(np.array([20, (i - 200 + origin) * width]), angle),
                 color=GRAY,
-                thickness=1
+                thickness=1,
             )
             draw_line(
                 surf,
                 rot(np.array([(i - 200 + origin) * width, -20]), angle),
                 rot(np.array([(i - 200 + origin) * width, 20]), angle),
                 color=GRAY,
-                thickness=1
+                thickness=1,
             )
 
     # Draw visited points

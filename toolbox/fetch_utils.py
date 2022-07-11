@@ -20,7 +20,7 @@ class FetchWrapper(gym.Wrapper):
 def cumulative_object_coverage(observations):
     object_pos = observations[:, :, 8:11]
     num_timesteps, num_envs = observations.shape[0], observations.shape[1]
-    cells = np.floor(object_pos * 10) # NUM_TIMESTEPS  x NUM_ENV x 3
+    cells = np.floor(object_pos * 10)  # NUM_TIMESTEPS  x NUM_ENV x 3
     seen_cells = []
     counts = np.zeros(num_timesteps)
     for t in range(num_timesteps):
