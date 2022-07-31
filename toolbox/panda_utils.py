@@ -2,7 +2,7 @@ import numpy as np
 
 
 def cumulative_object_coverage(observations):
-    object_pos = observations[:, :, 7:10]
+    object_pos = observations[:, :, 4:7]
     num_timesteps, num_envs = observations.shape[0], observations.shape[1]
     cells = np.floor(object_pos * 10)  # NUM_TIMESTEPS  x NUM_ENV x 3
     seen_cells = []
